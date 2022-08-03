@@ -274,6 +274,8 @@ public class MpController {
 	
 		return response;
 	}
+	//media_id 首先要先上传，然后才会有meida_id
+	//上传接口：https://api.weixin.qq.com/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=image
 	private static JSONObject responseImage(String content) {
 		JSONObject json=new JSONObject();
 		
