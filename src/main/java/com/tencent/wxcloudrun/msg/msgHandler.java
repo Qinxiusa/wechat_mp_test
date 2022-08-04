@@ -21,6 +21,8 @@ public class msgHandler {
 	public String msgContent;
 	public String MsgId;
 	public JSONObject responseJson;
+	public String url;
+	public String mediaId;
 	
 	public enum WechatMsgType{
 		Text("text"),//文本
@@ -59,9 +61,9 @@ public class msgHandler {
 	private static List<String> bringUpMsg=Arrays.asList(
 			"教育孩子不要“数罪并罚”\r\n"
 			+ "\r\n"
-			+ "“数罪并罚”首先说明家长平时与孩子相处的时间太少，关心得太少。\r\n"
+			+ "\"数罪并罚\"首先说明家长平时与孩子相处的时间太少，关心得太少。\r\n"
 			+ "\r\n"
-			+ "其次，也说明家长比较爱“记仇”，喜欢翻旧账。\r\n"
+			+ "其次，也说明家长比较爱\"记仇\"，喜欢翻旧账。\r\n"
 			+ "\r\n"
 			+ "有时不是你的话没有道理，而是你的方式不对。方式不对，教育一定没有效果。\r\n"
 			+ "\r\n"
@@ -71,11 +73,11 @@ public class msgHandler {
 			+ "\r\n"
 			+ "在教育中，克制比宣泄更重要。\r\n"
 			+ "\r\n"
-			+ "当孩子惹我们生气时，一定要忍一忍，先不急着发火，因为我们无论做什么事，首先冒出来的“第一念头”往往是有问题的。\r\n"
+			+ "当孩子惹我们生气时，一定要忍一忍，先不急着发火，因为我们无论做什么事，首先冒出来的\"第一念头\"往往是有问题的。\r\n"
 			+ "\r\n"
 			+ "有时候孩子犯的错误可能也不算什么事，只不过不合我们的意，或者时间不对，正好撞在了家长情绪的枪口上了。\r\n"
 			+ "\r\n"
-			+ "对父母而言，所谓的克制，就是避免“第一念头”。对待孩子“理直气壮、义正辞严”应该改为“理直气和，义正词婉”。\r\n"
+			+ "对父母而言，所谓的克制，就是避免\"第一念头\"。对待孩子\"理直气壮、义正辞严\"应该改为\"理直气和，义正词婉\"。\r\n"
 			+ "\r\n"
 			+ "管教从严，讲的也是原则从严，心思从严，态度则要尽可能的诚恳、温和、耐心。",
 			"不能想起了才教育\r\n"
@@ -135,7 +137,7 @@ public class msgHandler {
 			+ "",
 			"不拿别人家的孩子对比\r\n"
 			+ "\r\n"
-			+ "每个孩子都有巨大的差异，每个孩子都有成为“这个样子”的理由。教育孩子，最好就是针对他的“这个样子”进行。\r\n"
+			+ "每个孩子都有巨大的差异，每个孩子都有成为\"这个样子\"的理由。教育孩子，最好就是针对他的\"这个样子\"进行。\r\n"
 			+ "\r\n"
 			+ "莫扎特五岁拉得一手好琴，七岁就会谱曲，那是莫扎特。\r\n"
 			+ "\r\n"
@@ -161,7 +163,7 @@ public class msgHandler {
 				responseJson.put("Content",responseText(msgContent));
 				break;
 			case Image:
-				
+				responseJson.put("Image",responseImage());
 				break;
 			case Voice:
 				break;
@@ -194,5 +196,12 @@ public class msgHandler {
 		}
 		
 		return msg;
+	}
+	private static JSONObject responseImage() {
+		JSONObject json=new JSONObject();
+		String url="cbpk30Yh1FgqjYy13oZI7svrQO0mx6urOdeMsJMmBsklyw9rPwMMBtozJnJj3Nrg";
+		json.put("MediaId",url);
+		
+		return json;
 	}
 }
