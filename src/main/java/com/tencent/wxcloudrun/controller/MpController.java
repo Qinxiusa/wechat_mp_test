@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.tencent.wxcloudrun.controller.MpController.MsgType;
+import com.tencent.wxcloudrun.msg.msgHandler;
+import com.tencent.wxcloudrun.msg.msgHandler.WechatMsgType;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,28 +19,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping(value="/api")
 public class MpController {
 	
-	
-	public enum MsgType{
-		Text("text"),//文本
-		Image("image"),//图像
-		Voice("voice"),//声音
-		Video("video"),//视频
-		Music("music"),//音乐
-		News("news");//图文消息
-		
-		private String type;
-		private MsgType(String type) {
-			this.type=type;
-		}
-		@Override
-		public String toString() {
-			return this.type;
-		}
-	}
-	private static MsgType msgType;
+	private static String mpId;
+	private static String openId;
+	private static String msgContent;
 	
 	@Autowired
 	private RestTemplate http;
+	@Autowired
+	private msgHandler wechatMsg;
 	
 	@GetMapping("/test")
 	public String testMsg() {
@@ -91,7 +78,28 @@ public class MpController {
 		
 		JSONObject content=new JSONObject(requestBody);
 		
-		log.info("jsondata:{}",content.toString());
+		if(content!=null) {
+			if(content.has("action")) {
+				if("CheckContainerPath".equalsIgnoreCase(content.optString("action"))){
+					return result;
+				}else {
+					return content.optString("action");
+				}
+			}else if(content.has("MsgType")) {
+				
+				//被动回复消息，用户发消息到公众号，微信会将消息转发至此，可以在此进行拦截回复
+				wechatMsg.setMsgType(WechatMsgType.valueOf(content.optString("MsgType")));//消息类型
+				wechatMsg.setContent(content.optString("Content"));//发送内容
+				wechatMsg.setCreateTime(content.optString("CreateTime"));//发送时间
+				wechatMsg.setMpId(content.optString("ToUserName"));//小程序/公众号id
+				wechatMsg.setOpenId(content.optString("FromUserName"));//用户openId
+				wechatMsg.setMsgId(content.optString("MsgId"));//消息id
+			
+				result=wechatMsg.responseMsg();
+			}
+		}
+		
+		log.info("response:{}",result);
 		
 		return result;
 	}
