@@ -1,8 +1,7 @@
 package com.tencent.wxcloudrun.controller;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -87,29 +86,13 @@ public class MpController {
 	 */
 	@PostMapping("/recv")
 	public String getWechatPostMsg(@RequestBody String requestBody) {
+		String result="success";
 		log.info("recv wechat post msg:{}",requestBody);
-		String backMsg="success";
-
-//		try {
-//			JSONObject content=new JSONObject(requestBody);
-//			
-//			if(!"".equalsIgnoreCase(content.optString("ToUserName"))) {
-//		
-//				log.info("ToUserName:{}",content.optString("ToUserName"));
-//				log.info("FromUserName:{}",content.optString("FromUserName"));
-//				log.info("MsgType:{}",content.optString("MsgType"));
-//				log.info("Content:{}",content.optString("Content"));
-//				log.info("MsgId:{}",content.optString("MsgId"));
-//				
-//			}else if("CheckContainerPath".equalsIgnoreCase(content.optString("action"))) {
-//				backMsg="success";
-//			}
-//				
-//		} catch (JSONException e) {
-//			log.error("string to jsonobject error:{}",e.getMessage());
-//		}
-//		
 		
-		return backMsg;	
+		JSONObject content=new JSONObject(requestBody);
+		
+		log.info("jsondata:{}",content.toString());
+		
+		return result;
 	}
 }
