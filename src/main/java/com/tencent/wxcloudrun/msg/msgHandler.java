@@ -33,6 +33,14 @@ public class msgHandler {
 		public String toString() {
 			return this.type;
 		}
+		public static WechatMsgType getEnum(String value) {
+			for(WechatMsgType m:WechatMsgType.values()) {
+				if(m.type.equalsIgnoreCase(value)) {
+					return m;
+				}
+			}
+			throw new IllegalArgumentException();
+		}
 	}
 	
 	public String responseMsg() {
