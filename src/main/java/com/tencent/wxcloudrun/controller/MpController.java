@@ -90,31 +90,25 @@ public class MpController {
 		log.info("recv wechat post msg:{}",requestBody);
 		String backMsg="success";
 
-		try {
-			JSONObject content=new JSONObject(requestBody);
-			
-			if(!"".equalsIgnoreCase(content.optString("ToUserName"))) {
-//				msgReceiver.put("ToUserName",content.optString("ToUserName"));//小程序、公众号的原始id
-//				msgReceiver.put("FromUserName",content.optString("FromUserName"));//用户身份openId
-//				msgReceiver.put("CreateTime",content.optString("CreateTime"));//消息时间
-//				msgReceiver.put("MsgType",content.optString("MsgType"));//消息类型
-//				msgReceiver.put("Content",content.optString("Content"));//消息内容
-//				msgReceiver.put("MsgId",content.optString("MsgId"));//消息id
-				
-				log.info("ToUserName:{}",content.optString("ToUserName"));
-				log.info("FromUserName:{}",content.optString("FromUserName"));
-				log.info("MsgType:{}",content.optString("MsgType"));
-				log.info("Content:{}",content.optString("Content"));
-				log.info("MsgId:{}",content.optString("MsgId"));
-				
-			}else if("CheckContainerPath".equalsIgnoreCase(content.optString("action"))) {
-				backMsg="success";
-			}
-				
-		} catch (JSONException e) {
-			log.error("string to jsonobject error:{}",e.getMessage());
-		}
-		
+//		try {
+//			JSONObject content=new JSONObject(requestBody);
+//			
+//			if(!"".equalsIgnoreCase(content.optString("ToUserName"))) {
+//		
+//				log.info("ToUserName:{}",content.optString("ToUserName"));
+//				log.info("FromUserName:{}",content.optString("FromUserName"));
+//				log.info("MsgType:{}",content.optString("MsgType"));
+//				log.info("Content:{}",content.optString("Content"));
+//				log.info("MsgId:{}",content.optString("MsgId"));
+//				
+//			}else if("CheckContainerPath".equalsIgnoreCase(content.optString("action"))) {
+//				backMsg="success";
+//			}
+//				
+//		} catch (JSONException e) {
+//			log.error("string to jsonobject error:{}",e.getMessage());
+//		}
+//		
 		
 		return backMsg;	
 	}
