@@ -30,7 +30,9 @@ public class msgHandler {
 		Voice("voice"),//声音
 		Video("video"),//视频
 		Music("music"),//音乐
-		News("news");//图文消息
+		News("news"),//图文消息
+		Location("location"),//位置消息
+		Link("link");//链接消息
 		
 		private String type;
 		private WechatMsgType(String type) {
@@ -143,6 +145,7 @@ public class msgHandler {
 			+ "\r\n"
 			+ "对孩子而言，简单的对比解决不了问题，不妨耐心地和他分析，这样孩子既不会自卑，也不会对他人产生妒忌和敌意。"
 			);	
+	private List<JSONObject> imageBuffer= new ArrayList<JSONObject>();
 	
 	public String responseMsg() {
 		
@@ -158,25 +161,30 @@ public class msgHandler {
 			responseJson.put("CreateTime",System.currentTimeMillis());
 			responseJson.put("MsgType",MsgType.toString());
 			
-			switch(MsgType) {
-			case Text:
-				responseJson.put("Content",responseText(msgContent));
-				break;
-			case Image:
-				responseJson.put("Image",responseImage());
-				break;
-			case Voice:
-				break;
-			case Video:
-				break;
-			case Music:
-				break;
-			case News:
-				break;
-			default:
-				break;
-			}	
 			
+			if(msgContent.contains("老虎")) {
+				responseJson.put("Image",responseImage(1));
+			}else {
+				switch(MsgType) {
+				case Text:
+					responseJson.put("Content",responseText(msgContent));
+					break;
+				case Image:
+					responseJson.put("Image",responseImage(0));
+					break;
+				case Voice:
+					break;
+				case Video:
+					break;
+				case Music:
+					break;
+				case News:
+					break;
+				default:
+					break;
+				}				
+			}
+				
 			responseJson.put("result","success");
 		}
 		
@@ -197,8 +205,14 @@ public class msgHandler {
 		
 		return msg;
 	}
-	private static JSONObject responseImage() {
+	private static JSONObject responseImage(int id) {
 		JSONObject json=new JSONObject();
+		
+		if(id==0) {
+			
+		}
+		
+		
 		String url="cbpk30Yh1FgqjYy13oZI7svrQO0mx6urOdeMsJMmBsklyw9rPwMMBtozJnJj3Nrg";
 		json.put("MediaId",url);
 		
