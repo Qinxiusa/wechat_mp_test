@@ -6,12 +6,18 @@ import java.util.List;
 import java.util.Random;
 
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.tencent.wxcloudrun.dao.MessagesMapper;
+import com.tencent.wxcloudrun.model.MessagesEntity;
+
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
 @Component
+@Slf4j
 public class msgHandler {
 
 	public String openId;
@@ -23,6 +29,9 @@ public class msgHandler {
 	public JSONObject responseJson;
 	public String url;
 	public String mediaId;
+	
+	@Autowired
+	private static MessagesMapper messageMapper;
 	
 	public enum WechatMsgType{
 		Text("text"),//文本
@@ -162,7 +171,7 @@ public class msgHandler {
 			responseJson.put("MsgType",MsgType.toString());
 			
 			
-			if(msgContent.contains("老虎")) {
+			if(msgContent.contains("tiger")) {
 				responseJson.put("Image",responseImage(1));
 			}else {
 				switch(MsgType) {
@@ -205,16 +214,31 @@ public class msgHandler {
 		
 		return msg;
 	}
-	private static JSONObject responseImage(int id) {
+	private  JSONObject responseImage(int id) {
 		JSONObject json=new JSONObject();
 		
 		if(id==0) {
-			
+			//add image to db	
+			MessagesEntity message=new MessagesEntity();
+			message.setMsg_type("image");
+			message.setUser_name(openId);
+			message.setCreate_time(CreateTime);
+			json.put("url",url);
+			json.put("MediaId",mediaId);
+			message.setContent(json.toString());
+			messageMapper.insertData(message);
+		}else if(id==1) {
+			//check image and feedback
+			String result=messageMapper.selectContentByObject(msgContent);
+			log.info("get image:{}",result);
+			if(result.contains("MediaId")) {
+				JSONObject data=new JSONObject(result);
+				json.put("MediaId",data.optString("MediaId"));
+			}
 		}
 		
-		
-		String url="cbpk30Yh1FgqjYy13oZI7svrQO0mx6urOdeMsJMmBsklyw9rPwMMBtozJnJj3Nrg";
-		json.put("MediaId",url);
+		//String url="cbpk30Yh1FgqjYy13oZI7svrQO0mx6urOdeMsJMmBsklyw9rPwMMBtozJnJj3Nrg";
+		//json.put("MediaId",url);
 		
 		return json;
 	}

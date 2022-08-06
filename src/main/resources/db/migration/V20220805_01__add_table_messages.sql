@@ -1,6 +1,6 @@
 CREATE TABLE  IF NOT EXISTS `Messages` (
 
-`id` int(11) NOT NULL default '0',
+`id` int(11) NOT NULL AUTO_INCREMENT,
 
 `user_name` varchar(30) default NULL,
 
@@ -9,6 +9,8 @@ CREATE TABLE  IF NOT EXISTS `Messages` (
 `content` text default NULL,
 
 `create_time` varchar(20) default NULL,
+
+`object`  varchar(20) default NULL,
 
  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

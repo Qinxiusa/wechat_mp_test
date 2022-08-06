@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import com.tencent.wxcloudrun.dao.MessagesMapper;
 import com.tencent.wxcloudrun.msg.msgHandler;
 import com.tencent.wxcloudrun.msg.msgHandler.WechatMsgType;
 
@@ -27,6 +28,8 @@ public class MpController {
 	private RestTemplate http;
 	@Autowired
 	private msgHandler wechatMsg;
+	@Autowired
+	private MessagesMapper messageMapper;
 	
 	@GetMapping("/test")
 	public String testMsg() {
@@ -102,5 +105,27 @@ public class MpController {
 		log.info("response:{}",result);
 		
 		return result;
+	}
+	@GetMapping("/clearmsg")
+	public String clearMessage(int beg,int end) {
+	
+		int []ids=new int[end-beg+1];
+		
+		for(int i=beg,j=0;i<=end;i++) {
+			ids[j]=i;
+			j++;
+		}
+		
+		int res=messageMapper.deleteByIds(ids);
+		log.info("clear msg:{}",res);
+		return "success:"+Integer.toString(res);
+	}
+	@GetMapping("/updatemsg")
+	public String updateMsg(int id,String object) {
+		
+		int res=messageMapper.updateMsg(id, object);
+		log.info("update msg:{},id:{},content:{}",res,id,object);
+		return "success";
+		
 	}
 }
