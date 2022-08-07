@@ -31,7 +31,7 @@ public class msgHandler {
 	public String mediaId;
 	
 	@Autowired
-	private static MessagesMapper messageMapper;
+	private  MessagesMapper messageMapper;
 	
 	public enum WechatMsgType{
 		Text("text"),//文本
@@ -229,7 +229,13 @@ public class msgHandler {
 			json.put("url",url);
 			json.put("MediaId",mediaId);
 			message.setContent(json.toString());
-			messageMapper.insertData(message);
+			
+			if(messageMapper==null) {
+				json.put("result","mapper is null,no insert!");
+			}else {
+				messageMapper.insertData(message);
+			}
+			
 		}else if(id==1) {
 			//check image and feedback
 			String result=messageMapper.selectContentByObject(msgContent);
@@ -242,6 +248,8 @@ public class msgHandler {
 		
 		//String url="cbpk30Yh1FgqjYy13oZI7svrQO0mx6urOdeMsJMmBsklyw9rPwMMBtozJnJj3Nrg";
 		//json.put("MediaId",url);
+		
+		log.info("json :{}",json);
 		
 		return json;
 	}
