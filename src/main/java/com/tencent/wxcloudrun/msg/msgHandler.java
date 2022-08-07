@@ -158,6 +158,7 @@ public class msgHandler {
 	
 	public String responseMsg() {
 		
+		log.info("responseMsg function");
 		if(responseJson==null){
 			responseJson=new JSONObject();
 		}
@@ -176,9 +177,11 @@ public class msgHandler {
 			}else {
 				switch(MsgType) {
 				case Text:
+					log.info("receive text");
 					responseJson.put("Content",responseText(msgContent));
 					break;
 				case Image:
+					log.info("receive image");
 					responseJson.put("Image",responseImage(0));
 					break;
 				case Voice:

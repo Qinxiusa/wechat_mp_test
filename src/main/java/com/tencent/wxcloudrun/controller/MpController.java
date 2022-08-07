@@ -91,14 +91,29 @@ public class MpController {
 			}else if(content.has("MsgType")) {
 				
 				//被动回复消息，用户发消息到公众号，微信会将消息转发至此，可以在此进行拦截回复
-				wechatMsg.setMsgType(WechatMsgType.getEnum(content.optString("MsgType")));//消息类型
-				wechatMsg.setMsgContent(content.optString("Content"));//发送内容
-				wechatMsg.setCreateTime(content.optString("CreateTime"));//发送时间
-				wechatMsg.setMpId(content.optString("ToUserName"));//小程序/公众号id
-				wechatMsg.setOpenId(content.optString("FromUserName"));//用户openId
-				wechatMsg.setMsgId(content.optString("MsgId"));//消息id
-			
-				result=wechatMsg.responseMsg();
+				log.info("decode msg");
+				
+				if(wechatMsg!=null) {
+					wechatMsg.setMsgType(WechatMsgType.getEnum(content.optString("MsgType")));//消息类型
+					wechatMsg.setMsgContent(content.optString("Content"));//发送内容
+					wechatMsg.setCreateTime(content.optString("CreateTime"));//发送时间
+					wechatMsg.setMpId(content.optString("ToUserName"));//小程序/公众号id
+					wechatMsg.setOpenId(content.optString("FromUserName"));//用户openId
+					wechatMsg.setMsgId(content.optString("MsgId"));//消息id
+				
+					result=wechatMsg.responseMsg();				
+				}else {
+					
+					JSONObject responseJson=new JSONObject();
+					responseJson.put("ToUserName",content.optString("ToUserName"));
+					responseJson.put("FromUserName", content.optString("FromUserName"));
+					responseJson.put("CreateTime",System.currentTimeMillis());
+					responseJson.put("MsgType","text");
+					responseJson.put("Content","wechatMsg is null");
+					
+					result="";
+				}
+
 			}
 		}
 		
