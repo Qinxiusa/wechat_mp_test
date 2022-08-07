@@ -1,5 +1,7 @@
 package com.tencent.wxcloudrun.controller;
 
+import java.util.List;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.tencent.wxcloudrun.dao.MessagesMapper;
+import com.tencent.wxcloudrun.model.MessagesEntity;
 import com.tencent.wxcloudrun.msg.msgHandler;
 import com.tencent.wxcloudrun.msg.msgHandler.WechatMsgType;
 
@@ -143,13 +146,22 @@ public class MpController {
 	@GetMapping("/updatemsg")
 	public String updateMsg(int id,String object) {
 		
-		//int res=messageMapper.updateMsg(id, object);
-		//log.info("update msg:{},id:{},content:{}",res,id,object);
+		int res=messageMapper.updateMsg(id, object);
+		log.info("update msg:{},id:{},content:{}",res,id,object);
 		return "success";
 		
 	}
 	@GetMapping("/selectmsg")
 	public String selectMsg(String object) {
-		return "success";
+		
+		String result=messageMapper.selectContentByObject(object);
+		
+		if(result==null) {
+			return "find nothing";
+		}
+		
+		log.info("select msg:{}",result);
+		
+		return result.toString();
 	}
 }
