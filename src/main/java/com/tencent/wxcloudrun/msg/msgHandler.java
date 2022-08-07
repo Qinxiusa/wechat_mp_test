@@ -231,8 +231,10 @@ public class msgHandler {
 			message.setContent(json.toString());
 			
 			if(messageMapper==null) {
+				log.info("mapper is null");
 				json.put("result","mapper is null,no insert!");
 			}else {
+				log.info("insert image");
 				messageMapper.insertData(message);
 			}
 			
@@ -249,7 +251,7 @@ public class msgHandler {
 		//String url="cbpk30Yh1FgqjYy13oZI7svrQO0mx6urOdeMsJMmBsklyw9rPwMMBtozJnJj3Nrg";
 		//json.put("MediaId",url);
 		
-		log.info("json :{}",json);
+		log.info("id:{}, json :{}",id,json.toString());
 		
 		return json;
 	}
