@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.demo.mapper.MessagesMapper">
+
+	<!-- 根据消息类型查询所有数据 -->
+    <select id="selectByType" resultType="com.example.demo.entites.MessagesEntity">
+        select*from Messages where msg_type=#{msgType}  <!-- 也可以使用#{param1},但是不能使用#{msg_type} -->
+    </select>
+    <!-- 根据对象名称查询content数据 -->
+    <select id="selectContentByObject" resultType="string">
+    	select content from Messages where object=#{object}
+    </select>
+    <!-- 插入新的一行数据 -->
+    <insert id="insertData" parameterType="com.example.demo.entites.MessagesEntity">
+    	insert into Messages(user_name,msg_type,content,create_time,object) values(#{user_name},#{msg_type},#{content},#{create_time},#{object})
+    </insert>
+    <!-- 删除指定id数组内的数据 -->
+    <delete id="deleteByIds">
+    	delete from Messages where id in(
+    		<foreach collection="array" item="id" separator=",">
+    			#{id}
+    		</foreach>
+    	)
+    </delete>
+    <!-- 更新object数据，在用户发送图片过来后，用于对图像进行命名 -->
+    <update id="updateMsg">
+    	update Messages set object=#{object} where id=#{id}
+    </update>
+</mapper>
