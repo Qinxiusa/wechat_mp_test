@@ -28,8 +28,8 @@ public class MpController {
 	private RestTemplate http;
 	@Autowired
 	private msgHandler wechatMsg;
-	@Autowired
-	private MessagesMapper messageMapper;
+	//@Autowired
+	//private MessagesMapper messageMapper;
 	
 	@GetMapping("/test")
 	public String testMsg() {
@@ -116,15 +116,16 @@ public class MpController {
 			j++;
 		}
 		
-		int res=messageMapper.deleteByIds(ids);
-		log.info("clear msg:{}",res);
-		return "success:"+Integer.toString(res);
+		//int res=messageMapper.deleteByIds(ids);
+		//log.info("clear msg:{}",res);
+		//return "success:"+Integer.toString(res);
+		return "success";
 	}
 	@GetMapping("/updatemsg")
 	public String updateMsg(int id,String object) {
 		
-		int res=messageMapper.updateMsg(id, object);
-		log.info("update msg:{},id:{},content:{}",res,id,object);
+		//int res=messageMapper.updateMsg(id, object);
+		//log.info("update msg:{},id:{},content:{}",res,id,object);
 		return "success";
 		
 	}
