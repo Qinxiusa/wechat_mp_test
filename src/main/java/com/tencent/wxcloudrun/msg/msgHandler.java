@@ -229,15 +229,10 @@ public class msgHandler {
 			json.put("url",url);
 			json.put("MediaId",mediaId);
 			message.setContent(json.toString());
+			message.setObject("");
 			
-			if(messageMapper==null) {
-				log.info("mapper is null");
-				json.put("result","mapper is null,no insert!");
-			}else {
-				log.info("insert image");
-				messageMapper.insertData(message);
-			}
-			
+			messageMapper.insertData(message);
+			log.info("insert image ok");
 		}else if(id==1) {
 			//check image and feedback
 			String result=messageMapper.selectContentByObject(msgContent);

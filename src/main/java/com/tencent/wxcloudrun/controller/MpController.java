@@ -100,6 +100,11 @@ public class MpController {
 					wechatMsg.setMpId(content.optString("ToUserName"));//小程序/公众号id
 					wechatMsg.setOpenId(content.optString("FromUserName"));//用户openId
 					wechatMsg.setMsgId(content.optString("MsgId"));//消息id
+					
+					if(wechatMsg.getMsgType()==WechatMsgType.Image) {
+						wechatMsg.setUrl(content.optString("PicUrl"));
+						wechatMsg.setMediaId(content.optString("MediaId"));
+					}
 				
 					result=wechatMsg.responseMsg();				
 				}else {
