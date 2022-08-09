@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.tencent.wxcloudrun.dao.MessagesMapper;
 import com.tencent.wxcloudrun.model.MessagesEntity;
+import com.tencent.wxcloudrun.msg.msgHandler.WechatMsgType;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -20,15 +21,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class msgHandler {
 
-	public String openId;
-	public String mpId;
-	public String CreateTime;
-	public WechatMsgType MsgType;
-	public String msgContent;
-	public String MsgId;
-	public JSONObject responseJson;
-	public String url;
-	public String mediaId;
+	private String openId;
+	private String mpId;
+	private String CreateTime;
+	private WechatMsgType MsgType;
+	private String msgContent;
+	private String MsgId;
+	private JSONObject responseJson;
+	private String url;
+	private String mediaId;
 	
 	@Autowired
 	private  MessagesMapper messageMapper;
@@ -156,14 +157,52 @@ public class msgHandler {
 			);	
 	
 	private static final long periodOfValidity=3*24*60*60;
-	private List<JSONObject> imageBuffer= new ArrayList<JSONObject>();
-	
-	public String responseMsg() {
+
+	private void initialPara(JSONObject inputJson) {
 		
-		log.info("responseMsg function");
 		if(responseJson==null){
 			responseJson=new JSONObject();
 		}
+		
+		this.openId = inputJson.optString("FromUserName");//用户openId
+		this.mpId = inputJson.optString("ToUserName");//小程序/公众号id
+		this.CreateTime = inputJson.optString("CreateTime");//微信转发的发送时间
+		this.MsgType = WechatMsgType.getEnum(inputJson.optString("MsgType"));//消息类型
+		this.MsgId = inputJson.optString("MsgId");//消息id
+		
+		switch(MsgType) {
+		case Text:
+			this.msgContent = inputJson.optString("Content");
+			break;
+		case Image:
+			this.url = inputJson.optString("PicUrl");
+			this.mediaId = inputJson.optString("MediaId");
+			break;
+		case Voice:
+			break;
+		case Video:
+			break;
+		case Music:
+			break;
+		case News:
+			break;
+		default:
+			break;
+		}
+	}
+	public String responseException(String errMsg) {
+		responseJson.clear();
+		responseJson.put("ToUserName",openId);
+		responseJson.put("FromUserName", mpId);
+		responseJson.put("CreateTime",System.currentTimeMillis());
+		responseJson.put("MsgType","text");
+		responseJson.put("Content",errMsg);		
+		return responseJson.toString();
+	}
+	public String responseMsg(JSONObject inputJson) {
+		
+		log.info("responseMsg function");
+		initialPara(inputJson);
 			
 		if(MsgType==null) {
 			responseJson.put("result","msgtype is null");
@@ -171,97 +210,108 @@ public class msgHandler {
 			responseJson.put("ToUserName",openId);
 			responseJson.put("FromUserName", mpId);
 			responseJson.put("CreateTime",System.currentTimeMillis());
-			responseJson.put("MsgType",MsgType.toString());
+
+			switch(MsgType) {
+			case Text://先查询数据库中是否有相应的映射，有可能对应图片，音频==
+				log.info("receive text");
+				//check image and feedback
+				String result=messageMapper.selectContentByObject(this.msgContent);
+				if(result!=null) {//有查到
+					//确认是否在有效期内
+					String startSecond=messageMapper.selectCreateTimeByObject(this.msgContent);
+					if(startSecond!=null) {
+						long delay=System.currentTimeMillis()/1000-Long.valueOf(startSecond);
+						
+						if(delay>periodOfValidity) {
+							log.info("past due:{}",delay);
+							//回传文本
+							responseText("图像已过期!");
+						}else {
+							log.info("in period:{}",delay);
+							//回传图像
+							responseImage(result);
+						}
+					}else {
+						//回传文本
+						responseText("未记录起始时间!");						
+					}					
+				}else {
+					responseText("");
+				}
 			
-			
-			if(msgContent.contains("tiger")) {
-				responseJson.put("Image",responseImage(1));
-			}else {
-				switch(MsgType) {
-				case Text:
-					log.info("receive text");
-					responseJson.put("Content",responseText(msgContent));
-					break;
-				case Image:
-					log.info("receive image");
-					responseJson.put("Image",responseImage(0));
-					break;
-				case Voice:
-					break;
-				case Video:
-					break;
-				case Music:
-					break;
-				case News:
-					break;
-				default:
-					break;
-				}				
-			}
 				
+				break;
+			case Image:
+				log.info("receive image");
+				responseImage("add");
+				break;
+			case Voice:
+				break;
+			case Video:
+				break;
+			case Music:
+				break;
+			case News:
+				break;
+			default:
+				break;
+			}				
+					
 			responseJson.put("result","success");
 		}
 		
 		return responseJson.toString();
 	}
-	private static String responseText(String recvMsg) {
+	private  void responseText(String response) {
 		String msg="你好,先生!";
 		Random idx=new Random();
-		if(recvMsg.contains("你好")) {
-			msg="你好";
-		}else if(recvMsg.contains("帅哥")) {
-			msg="美女";
-		}else if(recvMsg.contains("佩洛西")) {
-			msg=ans.get(idx.nextInt(ans.size()));
-		}else if(recvMsg.contains("儿童教育")) {
-			msg=bringUpMsg.get(idx.nextInt(bringUpMsg.size()));
+		if(!"".equalsIgnoreCase(this.msgContent)) {
+			if(this.msgContent.contains("你好")) {
+				msg="你好";
+			}else if(this.msgContent.contains("帅哥")) {
+				msg="美女";
+			}else if(this.msgContent.contains("佩洛西")) {
+				msg=ans.get(idx.nextInt(ans.size()));
+			}else if(this.msgContent.contains("儿童教育")) {
+				msg=bringUpMsg.get(idx.nextInt(bringUpMsg.size()));
+			}else if(this.msgContent.contains("移动客服")) {
+				msg="10086";
+			}else if(this.msgContent.contains("小池")) {
+				msg="宋代诗人·杨万里\r\n泉眼无声惜细流\r\n树阴照水爱晴柔\r\n小荷才露尖尖角\r\n早有蜻蜓立上头\r\n";
+			}else if(this.msgContent.contains("静夜思")) {
+				msg="唐代诗人·李白\r\n床前明月光\r\n疑是地上霜\r\n举头望明月\r\n低头思故乡\r\n";
+			}else if(this.msgContent.contains("悯农")) {
+				msg="唐代诗人·李绅\r\n锄禾日当午\r\n汗滴禾下土\r\n谁知盘中餐\r\n粒粒皆辛苦\r\n";
+			}	
+		}else {
+			msg=response;
 		}
-		
-		return msg;
+
+		responseJson.put("MsgType","text");
+		responseJson.put("Content",msg);	
+		this.msgContent="";
 	}
-	private  JSONObject responseImage(int id) {
-		JSONObject json=new JSONObject();
+	private void responseImage(String result) {
 		
-		if(id==0) {
-			//add image to db	
+		if("add".equalsIgnoreCase(result)) {
+			//添加到数据库
 			MessagesEntity message=new MessagesEntity();
 			message.setMsg_type("image");
 			message.setUser_name(openId);
 			message.setCreate_time(CreateTime);
+			JSONObject json=new JSONObject();
 			json.put("url",url);
 			json.put("MediaId",mediaId);
 			message.setContent(json.toString());
 			message.setObject("");
-			
+			responseJson.put("MediaId",this.mediaId);
 			int recordid=messageMapper.insertData(message);
 			log.info("insert image ok:{}",recordid);
-		}else if(id==1) {
-			
-			//check image and feedback
-			String result=messageMapper.selectContentByObject(msgContent);
-			//log.info("get image:{}",result);
-			String startSecond=messageMapper.selectCreateTimeByObject(msgContent);
-			
-			if(startSecond!=null) {
-				long delay=System.currentTimeMillis()/1000-Long.valueOf(startSecond);
-				
-				if(delay>periodOfValidity) {
-					log.info("past due:{}",delay);
-					//回传文本
-					responseJson.remove("Image");
-					responseJson.put("Content","图像已过期!");
-				}else {
-					log.info("in period:{}",delay);
-					//回传图像
-					responseJson.put("MsgType","image");
-					if(result.contains("MediaId")) {
-						JSONObject data=new JSONObject(result);
-						json.put("MediaId",data.optString("MediaId"));
-					}
-				}
-			}
+		}else {
+			JSONObject json=new JSONObject(result);
+			responseJson.put("MediaId",json.optString("MediaId"));
 		}
 		
-		return json;
+		responseJson.put("MsgType","image");	
 	}
 }
