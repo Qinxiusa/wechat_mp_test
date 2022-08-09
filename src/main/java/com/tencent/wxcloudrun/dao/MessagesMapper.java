@@ -16,4 +16,5 @@ public interface MessagesMapper {
 	int deleteByIds(int[]ids);
 	int updateMsg(@Param("id")int id,@Param("object")String object);
 	String selectContentByObject(String object);
+	String selectCreateTimeByObject(String object);
 }

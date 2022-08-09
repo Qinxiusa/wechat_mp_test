@@ -10,6 +10,9 @@
     <select id="selectContentByObject" resultType="string">
     	select content from Messages where object=#{object}
     </select>
+    <select id="selectCreateTimeByObject" resultType="string">
+    	select create_time from Messages where object=#{object}
+    </select>
     <!-- 插入新的一行数据 -->
     <insert id="insertData" parameterType="com.tencent.wxcloudrun.model.MessagesEntity">
     	insert into Messages(user_name,msg_type,content,create_time,object) values(#{user_name},#{msg_type},#{content},#{create_time},#{object})

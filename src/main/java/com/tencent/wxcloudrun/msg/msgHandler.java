@@ -154,6 +154,8 @@ public class msgHandler {
 			+ "\r\n"
 			+ "对孩子而言，简单的对比解决不了问题，不妨耐心地和他分析，这样孩子既不会自卑，也不会对他人产生妒忌和敌意。"
 			);	
+	
+	private static final long periodOfValidity=3*24*60*60;
 	private List<JSONObject> imageBuffer= new ArrayList<JSONObject>();
 	
 	public String responseMsg() {
@@ -231,23 +233,34 @@ public class msgHandler {
 			message.setContent(json.toString());
 			message.setObject("");
 			
-			messageMapper.insertData(message);
-			log.info("insert image ok");
+			int recordid=messageMapper.insertData(message);
+			log.info("insert image ok:{}",recordid);
 		}else if(id==1) {
-			responseJson.put("MsgType","image");
+			
 			//check image and feedback
 			String result=messageMapper.selectContentByObject(msgContent);
 			//log.info("get image:{}",result);
-			if(result.contains("MediaId")) {
-				JSONObject data=new JSONObject(result);
-				json.put("MediaId",data.optString("MediaId"));
+			String startSecond=messageMapper.selectCreateTimeByObject(msgContent);
+			
+			if(startSecond!=null) {
+				long delay=System.currentTimeMillis()/1000-Long.valueOf(startSecond);
+				
+				if(delay>periodOfValidity) {
+					log.info("past due:{}",delay);
+					//回传文本
+					responseJson.remove("Image");
+					responseJson.put("Content","图像已过期!");
+				}else {
+					log.info("in period:{}",delay);
+					//回传图像
+					responseJson.put("MsgType","image");
+					if(result.contains("MediaId")) {
+						JSONObject data=new JSONObject(result);
+						json.put("MediaId",data.optString("MediaId"));
+					}
+				}
 			}
 		}
-		
-		//String url="cbpk30Yh1FgqjYy13oZI7svrQO0mx6urOdeMsJMmBsklyw9rPwMMBtozJnJj3Nrg";
-		//json.put("MediaId",url);
-		
-		//log.info("id:{}, json :{}",id,json.toString());
 		
 		return json;
 	}
