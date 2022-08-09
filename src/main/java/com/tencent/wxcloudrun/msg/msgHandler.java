@@ -234,9 +234,10 @@ public class msgHandler {
 			messageMapper.insertData(message);
 			log.info("insert image ok");
 		}else if(id==1) {
+			responseJson.put("MsgType","image");
 			//check image and feedback
 			String result=messageMapper.selectContentByObject(msgContent);
-			log.info("get image:{}",result);
+			//log.info("get image:{}",result);
 			if(result.contains("MediaId")) {
 				JSONObject data=new JSONObject(result);
 				json.put("MediaId",data.optString("MediaId"));
@@ -246,7 +247,7 @@ public class msgHandler {
 		//String url="cbpk30Yh1FgqjYy13oZI7svrQO0mx6urOdeMsJMmBsklyw9rPwMMBtozJnJj3Nrg";
 		//json.put("MediaId",url);
 		
-		log.info("id:{}, json :{}",id,json.toString());
+		//log.info("id:{}, json :{}",id,json.toString());
 		
 		return json;
 	}
